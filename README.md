@@ -127,6 +127,94 @@ onBind（）方法和onUnbind（）方法只在第一个bindService流程中触�
 那么，在第二次调用Context.bindService()的时候，就会激活Service.onRebind(intent)，去切换不同的绑定。
 ![Alt text](https://github.com/liuChongyang95/ServiceTest/raw/master/Screenshots/lifetime2.png)
 ![Alt text](https://github.com/liuChongyang95/ServiceTest/raw/master/Screenshots/ServiceLife.png)
+![Alt text](https://github.com/liuChongyang95/ServiceTest/raw/master/Screenshots/yunxingtu.png)
 
+----
+4.1以Runnable接口实现Service多线程操作
+
+由于Android系统资源有限。GPU、RAM、CPU各有各的运行机制。
+当主线程中存在大文件读取、图片批量处理、网络连接超时等操作时，
+一旦时间超过5秒，Android系统就会出现“设置运行缓慢”的提示，
+logcat日志上也会显示“The application may be doing too work on its main thread”等提示。
+在开发Service服务时，若存在此类操作时，开发人员就应该尝试使用多线程方式进行开发，避免主线程被长时间占用。
+![Alt text](https://github.com/liuChongyang95/ServiceTest/raw/master/Screenshots/async.png)
+
+----
+4.2 IntentService服务简介
+在Service服务中心出现延时性操作是普遍遇到的情况。
+见Android系统为开发人员提供的Service的子类IntentService，当IntentService执行startService()方法时，
+系统将使用一个循环程序将该服务加入到一个子线程队列当中，以便执行服务当中的操作。
+
+public abstract class IntentService extends Service {
+    private volatile Looper mServiceLooper;
+    private volatile ServiceHandler mServiceHandler;
+    private String mName;
+    private boolean mRedelivery;
+
+    private final class ServiceHandler extends Handler {
+        public ServiceHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            onHandleIntent((Intent)msg.obj);
+            stopSelf(msg.arg1);
+        }
+    }
+
+    public IntentService(String name) {
+        super();
+        mName = name;
+    }
+
+    public void setIntentRedelivery(boolean enabled) {
+        mRedelivery = enabled;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        HandlerThread thread = new HandlerThread("IntentService[" + mName + "]");
+        thread.start();
+
+        mServiceLooper = thread.getLooper();
+        mServiceHandler = new ServiceHandler(mServiceLooper);
+    }
+
+    @Override
+    public void onStart(Intent intent, int startId) {
+        Message msg = mServiceHandler.obtainMessage();
+        msg.arg1 = startId;
+        msg.obj = intent;
+        mServiceHandler.sendMessage(msg);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        onStart(intent, startId);
+        return mRedelivery ? START_REDELIVER_INTENT : START_NOT_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        mServiceLooper.quit();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    protected abstract void onHandleIntent(Intent intent);
+}
+
+在onCreate()方法中建立了独立的工作线程，在初始化时建立单线程去执行多个异步任务。
+当系统调用Context.startService()方法时，将通过onStart()方法使用异步方式，调用ServiceHandler.handlerMessage(msg)
+进行处理，而handleMessage（msg）调用虚拟方法onHandleIntent（Intent），然后以stopSelf()结束服务。
+所以需要重写HandleIntent(Intent)方法，便可异步方法执行IntentService。
+![Alt text](https://github.com/liuChongyang95/ServiceTest/raw/master/Screenshots/intentservice.png)
+
+----
 
 ConstraintLayout 适合拖拽制作界面
