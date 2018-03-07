@@ -17,6 +17,7 @@ public class MyService extends Service {
             return MyService.this;
         }
     }
+
     private double param;
     private MyBinder myBinder;
 
@@ -29,11 +30,13 @@ public class MyService extends Service {
 
     //intent startcommand输入对象、flags 启动方式、startId 唯一标识符
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId){
+    public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(Context.ACTIVITY_SERVICE, "Service onStartCommand ");
-        String name = intent.getStringExtra("Name");
-        this.param=intent.getDoubleExtra("param",1.0);
-        Log.i(Context.ACTIVITY_SERVICE, "His name is" + name);
+        Log.i(Context.ACTIVITY_SERVICE, "Main thread id is " + Thread.currentThread().getId());
+        final String name = intent.getStringExtra("Name");
+        this.param = intent.getDoubleExtra("param", 1.0);
+        //以异步方式进行模拟操作
+        new Thread(new AsynvRunnable(){}).start();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -68,7 +71,7 @@ public class MyService extends Service {
         return calendar.getTime().toString();
     }
 
-    public double getValue(int value){
-        return value*param;
+    public double getValue(int value) {
+        return value * param;
     }
 }

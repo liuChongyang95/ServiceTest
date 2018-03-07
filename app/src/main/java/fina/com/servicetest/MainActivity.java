@@ -20,9 +20,9 @@ public class MainActivity extends AppCompatActivity {
     private Button unbindS;
     private static boolean connected = false;
 
-    private MyserviceConnection myserviceConnection = new MyserviceConnection();
+    private myServiceConnection myServiceConnection = new myServiceConnection();
 
-    class MyserviceConnection implements ServiceConnection {
+    class myServiceConnection implements ServiceConnection {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.i(Context.ACTIVITY_SERVICE, "Service Connected");
@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
             MyService.MyBinder myBinder = (MyService.MyBinder) service;
             MyService myService = myBinder.getService();
             //生出随机数
-            Random random=new Random();
-            double value=myService.getValue(random.nextInt(10)*1000);
+            Random random = new Random();
+            double value = myService.getValue(random.nextInt(10) * 1000);
             //显示计算结果
             data = myService.getData();
             Log.i(Context.ACTIVITY_SERVICE, String.valueOf(value));
@@ -52,37 +52,45 @@ public class MainActivity extends AppCompatActivity {
         stopS = findViewById(R.id.stopService);
         bindS = findViewById(R.id.bindService);
         unbindS = findViewById(R.id.unbindService);
-        myserviceConnection = new MyserviceConnection();
+        myServiceConnection = new myServiceConnection();
     }
 
     public void btnStart_onClick(View view) {
         //Intent 绑定MyService，加入输入参数
         Intent intent = new Intent(MainActivity.this, MyService.class);
         intent.putExtra("Name", "Leslie");
-        intent.putExtra("param",0.88);
-        Log.i(Context.ACTIVITY_SERVICE, "startService");
+        intent.putExtra("param", 0.88);
         //启动service
         startService(intent);
+        Intent intent1 = new Intent(this, MyIntentService.class);
+        intent1.putExtra("msg", "intentService1");
+        startService(intent1);
+        Intent intent2 = new Intent(this, MyIntentService.class);
+        intent2.putExtra("msg", "intentService2");
+        startService(intent2);
+        Intent intent3 = new Intent(this, MyIntentService.class);
+        intent3.putExtra("msg", "intentService3");
+        startService(intent3);
+
     }
 
     public void btnStop_onClick(View view) {
         Intent intent = new Intent(MainActivity.this, MyService.class);
-        Log.i(Context.ACTIVITY_SERVICE, "btnStop_onClick: ");
         stopService(intent);
+        Intent intent1 = new Intent(this, MyIntentService.class);
+        stopService(intent1);
     }
 
     public void btnBind(View view) {
         connected = true;
         Intent intent = new Intent(this, MyService.class);
-        Log.i(Context.ACTIVITY_SERVICE, "btnBind");
         //bind方式启动
-        bindService(intent, myserviceConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, myServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     public void btnUnBind(View view) {
         if (connected) {
-            Log.i(Context.ACTIVITY_SERVICE, "btnUnBind: ");
-            unbindService(myserviceConnection);
+            unbindService(myServiceConnection);
             connected = false;
         }
     }
