@@ -23,7 +23,7 @@ Local Service & Remote Service 本地和远程
 1.2.1
     生命周期模型分类：Context.startService()启动—Context.stopService()结束（缺乏灵活性）
 
-                      Context.bindService()启动—Context.unbindService()结束（灵活。通过Ibinder借口中获取Service的句柄）
+                    Context.bindService()启动—Context.unbindService()结束（灵活。通过Ibinder借口中获取Service的句柄）
 
 startService()启动本地服务,bindService()用于远程绑定.也可以混合使用，多次绑定。
 
@@ -97,7 +97,7 @@ android:label　　    服务的名字，如果为空，默认显示的服务名
 android:icon　　     服务的图标
 android:permission   申明此服务的权限，这意味着只有提供了该权限的应用才能控制或连接此服务
 android:process　    表示该服务是否运行在另外一个进程，如果设置了此项，那么将会在包名后面加上这段字符串表示另一进程的名字
-android:enabled　    如果此项设置为 true，那么 Service 将会默认被系统启动，默认值为 false
+android:enabled　    如果此项设置为 true，那么 Service 将可以被系统实例化，默认值为 false
 android:exported　   表示该服务是否能够被其他应用程序所控制或连接，默认值为 false
 ----
 3.1 通过Context.bindService启动Service服务
