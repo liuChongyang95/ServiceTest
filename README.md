@@ -36,7 +36,6 @@ startService()启动本地服务,bindService()用于远程绑定.也可以混合
                    寄存于另一个进程，通过AIDL（android interface definition language）定义接口语言，
                    实现Android设备的两个进程间通信（IPC）。
                    AIDL的IPC机制基于RPC（Remote process call）远程过程调用协议建立的，用于约束进程间的通讯规则，供编译器生成代码。
-    
 ----
 Service的生命周期
 
@@ -58,6 +57,7 @@ boolean onUnbind(Intent intent)           调用Context.unbindService触发。�
 
 void onDestroy()                          1.startService—stopService 2.bindService—bindService 3. startService+bindService—unbindService+stopService
                                           (sS和bS谁先谁后无所谓)
+
 ----
 
 onStartCommand方法
@@ -90,6 +90,7 @@ Context.startService（intent）调用时：先触发Service的onCreate()，进�
 Context.bindService()方法调用时：也会触发onCreate，然后触发onBind对服务进行绑定，成功获取Service句柄后，系统会通过
                                  用户自定义的serviceConnection对象onServiceConnected（ComponentName name，IBinder service）方法
                                  对Service对象作出处理。最后当系统调用unbindService时，就会激发onDestory做最后处理。
+                                 
 ----
 Service配置说明：
 android:name　       服务类名，注意如果Service与Activity不在同一个包中，在android:name上必须写上Service的全路径
@@ -99,6 +100,7 @@ android:permission   申明此服务的权限，这意味着只有提供了该�
 android:process　    表示该服务是否运行在另外一个进程，如果设置了此项，那么将会在包名后面加上这段字符串表示另一进程的名字
 android:enabled　    如果此项设置为 true，那么 Service 将可以被系统实例化，默认值为 false
 android:exported　   表示该服务是否能够被其他应用程序所控制或连接，默认值为 false
+
 ----
 3.1 通过Context.bindService启动Service服务
 
@@ -109,6 +111,7 @@ void onServiceConnected(ComponentName name,IBinder service)和
 void onServiceDisconnected(ComponentName name)。
 在Context.bindService()完成绑定后，系统就会调用onServiceConnected()方法，用户可以通过IBinder参数获取Service句柄，
 对Service进行处理。而onServiceDisconnected()方法一般不会调用，只有Service被绑定后，由于内存不足等问题被kill才会调用。
+
 ----
 3.3 Service服务的综合运用
 
